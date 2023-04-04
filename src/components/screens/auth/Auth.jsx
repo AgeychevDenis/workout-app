@@ -1,23 +1,71 @@
 import Button from '../../ui/button/Button'
 import Layout from '../../layout/Layout'
+import Field from '../../ui/Field/Field'
 
 import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 
 import styles from './Auth.module.scss'
 
 const Auth = () => {
-	const { register, handleSubmit } = useForm({
-		resolver: yupResolver(schema)
+	const [type, setType] = useState('auth')
+
+	/* 
+	TODO:
+
+	[] - Auth context
+	[] - Axios
+	[] - React Query
+
+*/
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors }
+	} = useForm({
+		mode: 'onChange'
 	})
 
+	const onSubmit = data => {
+		// type
+		console.log(data)
+	}
+
 	return (
-		<Layout bgImage='/images/auth-bg.png'>
-			<form onSubmit={handleSubmit(d => console.log(d))}>
-				<input {...register('name')} />
-				<input type='number' {...register('age')} />
-				<input type='submit' />
-			</form>
-		</Layout>
+		<>
+			<Layout heading='Sign in' bgImage='/images/auth-bg.png' />
+			<div className='wrapper-inner-page'>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<Field
+						error={errors?.email?.message}
+						name='email'
+						register={register}
+						options={{
+							required: 'Email is required'
+						}}
+						type='text'
+						placeholder='Enter email'
+					/>
+
+					<Field
+						error={errors?.password?.message}
+						name='password'
+						register={register}
+						options={{
+							required: 'Password is required'
+						}}
+						type='password'
+						placeholder='Enter password'
+					/>
+
+					<div className={styles.wrapperButtons}>
+						<Button clickHandler={() => setType('auth')}>Sign in</Button>
+						<Button clickHandler={() => setType('reg')}>Sign up</Button>
+					</div>
+				</form>
+			</div>
+		</>
 	)
 }
 

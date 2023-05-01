@@ -6,30 +6,34 @@ import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 
 import styles from './Auth.module.scss'
+import { useMutation } from '@tanstack/react-query'
+import AuthService from '../../../services/auth.service'
 
 const Auth = () => {
-	const [type, setType] = useState('auth')
-
-	/* 
-	TODO:
-
-	[] - Auth context
-	[] - Axios
-	[] - React Query
-
-*/
+	const [type, setType] = useState('login')
 
 	const {
 		register,
 		handleSubmit,
-		formState: { errors }
+		formState: { errors },
+		reset
 	} = useForm({
 		mode: 'onChange'
 	})
 
+	const { mutate, isLoading } = useMutation(
+		['auth'],
+		({ email, password }) => AuthService.main(email, password, type),
+		{
+			onSuccess: data => {
+				alert('success')
+				reset()
+			}
+		}
+	)
+
 	const onSubmit = data => {
-		// type
-		console.log(data)
+		mutate(data)
 	}
 
 	return (
@@ -37,6 +41,7 @@ const Auth = () => {
 			<Layout heading='Sign in' bgImage='/images/auth-bg.png' />
 			<div className='wrapper-inner-page'>
 				<form onSubmit={handleSubmit(onSubmit)}>
+					{(isLoading || isLoadingAuth) && <Loader />}
 					<Field
 						error={errors?.email?.message}
 						name='email'
@@ -60,8 +65,8 @@ const Auth = () => {
 					/>
 
 					<div className={styles.wrapperButtons}>
-						<Button clickHandler={() => setType('auth')}>Sign in</Button>
-						<Button clickHandler={() => setType('reg')}>Sign up</Button>
+						<Button clickHandler={() => setType('login')}>Sign in</Button>
+						<Button clickHandler={() => setType('register')}>Sign up</Button>
 					</div>
 				</form>
 			</div>
